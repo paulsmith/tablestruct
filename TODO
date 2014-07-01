@@ -1,0 +1,10 @@
+* Handle primary keys (auto ID? (int64))
+* Include SQL functions or other expressions in output rows
+* Handle aggregates (don't?)
+* Handle LIMIT and OFFSET
+* Handle ORDER BY
+* Handle nullability
+* Prepare all SQL statements
+* Figure out solution for FindWhere that's SQL-injection-safe
+* gofmt generated code
+* Specify output filenames
