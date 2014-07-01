@@ -8,6 +8,7 @@ $(OBJECT_FILES): simple.ts.json
 simple: $(OBJECT_FILES) simple.go
 	go build
 
+.PHONY: schema.sql
 schema.sql:
 	pg_dump -x -O -t person -s > $@
 

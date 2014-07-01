@@ -21,10 +21,10 @@ SET default_with_oids = false;
 
 CREATE TABLE person (
     id integer NOT NULL,
-    full_name character varying,
-    email character varying,
-    age integer,
-    created_on timestamp without time zone
+    full_name character varying NOT NULL,
+    email character varying NOT NULL,
+    age integer NOT NULL,
+    created_on timestamp without time zone NOT NULL
 );
 
 
@@ -52,6 +52,14 @@ ALTER SEQUENCE person_id_seq OWNED BY person.id;
 --
 
 ALTER TABLE ONLY person ALTER COLUMN id SET DEFAULT nextval('person_id_seq'::regclass);
+
+
+--
+-- Name: person_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY person
+    ADD CONSTRAINT person_pkey PRIMARY KEY (id);
 
 
 --

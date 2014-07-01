@@ -42,7 +42,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(p)
+	fmt.Println(p2)
 
 	p2.Name = "Brian Eno"
 	p2.Email = "brian@eno.net"
