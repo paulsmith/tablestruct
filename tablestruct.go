@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"go/format"
+	"go/parser"
+	"go/token"
 	"log"
 	"os"
 	"strings"
@@ -98,6 +101,7 @@ func (c Code) Gen(mapper Map, pkg string) {
 	for i, tableMap := range mapper {
 		log.Printf("%d: generating %s", i, tableMap.Struct)
 		c.genMapper(tableMap, pkg)
+
 		filename := strings.ToLower(tableMap.Struct) + "_mapper.go"
 		path := c.dest + "/" + filename
 		f, err := os.Create(path)
@@ -105,11 +109,21 @@ func (c Code) Gen(mapper Map, pkg string) {
 			log.Fatal(err)
 		}
 		defer f.Close()
-		if _, err := c.buf.WriteTo(f); err != nil {
+
+		// gofmt
+		fset := token.NewFileSet()
+		ast, err := parser.ParseFile(fset, "", c.buf.Bytes(), parser.ParseComments)
+		if err != nil {
 			log.Fatal(err)
 		}
+		err = format.Node(f, fset, ast)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		c.buf.Reset()
 	}
+
 	// Auxiliary support for mapper - Scanner interface
 	path := c.dest + "/" + "scanner.go"
 	f, err := os.Create(path)
