@@ -7,7 +7,6 @@
 * Prepare all SQL statements
 * Figure out solution for FindWhere that's SQL-injection-safe
 * Specify output filenames
-* delete
 * insert multiple
 * update multiple
 * exists
