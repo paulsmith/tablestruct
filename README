@@ -18,3 +18,4 @@ Roadmap
 * 0.2: Introspect db to autogenerate initial mapping metadata file.
 * 0.3: Generate structs from metadata.
 * 0.4: Generate db schema from metadata.
+* 0.5: Joins.
