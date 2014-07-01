@@ -78,9 +78,14 @@ func (t TableMap) PKCol() string {
 	return "id"
 }
 
+// PKField returns the name of the primary key struct field.
+func (t TableMap) PKField() string {
+	return "ID"
+}
+
 // Fields returns the list of field names of the Go struct being mapped.
 func (t TableMap) Fields() []string {
-	f := []string{"ID"}
+	f := []string{t.PKField()}
 	for i := range t.Columns {
 		f = append(f, t.Columns[i].Field)
 	}
@@ -115,6 +120,7 @@ type tableMapTmpl struct {
 	ColumnList   string
 	Table        string
 	PKCol        string
+	PKField      string
 	Fields       []string
 	UpdateList   string
 	UpdateCount  int
@@ -170,6 +176,7 @@ func (c Code) genMapper(mapper TableMap) tableMapTmpl {
 		mapper.ColumnList(),
 		mapper.Table,
 		mapper.PKCol(),
+		mapper.PKField(),
 		mapper.Fields(),
 		mapper.UpdateList(),
 		len(mapper.Columns) + 1,

@@ -76,5 +76,11 @@ func ({{.VarName}} {{.MapperType}}) FindWhere(where string) ([]*{{.StructType}},
     return objs, nil
 }
 
+func ({{.VarName}} {{.MapperType}}) Delete(obj *{{.StructType}}) error {
+    sql := "DELETE FROM {{.Table}} WHERE {{.PKCol}} = $1"
+    _, err := {{.VarName}}.db.Exec(sql, obj.{{.PKField}})
+    return err
+}
+
 {{end}}
 `
