@@ -189,6 +189,10 @@ func usage() {
 }
 
 func main() {
+	var (
+		pkg = flag.String("pkg", "main", "package of generated code")
+	)
+
 	flag.Usage = usage
 
 	flag.Parse()
@@ -214,5 +218,5 @@ func main() {
 		tmpl: template.Must(template.New("tablestruct").Parse(mapperTemplate)),
 		dest: flag.Arg(1),
 	}
-	code.Gen(mapper, "main")
+	code.Gen(mapper, *pkg)
 }
