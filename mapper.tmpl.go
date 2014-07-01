@@ -80,6 +80,25 @@ func ({{.VarName}} {{.MapperType}}) Insert(obj *{{.StructType}}) error {
     return err
 }
 
+func ({{.VarName}} {{.MapperType}}) InsertMany(objs []*{{.StructType}}) error {
+    tx, err := {{.VarName}}.db.Begin()
+    if err != nil {
+        return err
+    }
+    stmt := tx.Stmt({{.VarName}}.stmt["Insert"])
+    for _, obj := range objs {
+        args := []interface{}{
+            {{range .Fields}}obj.{{.}},
+            {{end}}
+        }
+        _, err := stmt.Exec(args...)
+        if err != nil {
+            return err
+        }
+    }
+    return tx.Commit()
+}
+
 func ({{.VarName}} {{.MapperType}}) FindWhere(where string) ([]*{{.StructType}}, error) {
     sql := "SELECT {{.ColumnList}} FROM {{.Table}} WHERE " + where
     rows, err := {{.VarName}}.db.Query(sql)
