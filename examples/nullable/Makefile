@@ -1,4 +1,4 @@
-OBJECT_FILES = guestbook_mapper.go scanner.go
+OBJECT_FILES = mapper.go
 
 all: $(OBJECT_FILES) nullable
 

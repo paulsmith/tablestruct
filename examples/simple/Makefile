@@ -1,4 +1,4 @@
-OBJECT_FILES = person_mapper.go scanner.go
+OBJECT_FILES = mapper.go
 
 all: $(OBJECT_FILES) simple
 

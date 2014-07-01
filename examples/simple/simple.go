@@ -62,4 +62,8 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println(ps)
+
+	if err := m.Delete(p); err != nil {
+		log.Fatal(err)
+	}
 }
