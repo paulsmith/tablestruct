@@ -7,3 +7,17 @@
 * Prepare all SQL statements
 * Figure out solution for FindWhere that's SQL-injection-safe
 * Specify output filenames
+* delete
+* insert multiple
+* update multiple
+* exists
+* count
+* find all
+* find by field
+* find one by field
+* save (insert/update)
+* insert returning ID
+* override naming
+* Hooks for adding custom code
+* Factory to get a mapper for a struct
+* Support transactions
