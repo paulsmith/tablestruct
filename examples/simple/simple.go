@@ -4,29 +4,21 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 
 	_ "github.com/lib/pq"
 )
 
 type Person struct {
-	ID    int64
-	Name  string
-	Email string
-	Age   int
+	ID        int64
+	Name      string
+	Email     string
+	Age       int
+	CreatedOn time.Time
 }
 
 func (p Person) String() string {
-	return fmt.Sprintf("%d: name=%s email=%s age=%d", p.ID, p.Name, p.Email, p.Age)
-}
-
-type Phone struct {
-	ID     int64
-	Number string
-	Type   int
-}
-
-func (p Phone) String() string {
-	return fmt.Sprintf("%d: number=%s type=%d", p.ID, p.Number, p.Type)
+	return fmt.Sprintf("%d: name=%s email=%s age=%d createdon=%v", p.ID, p.Name, p.Email, p.Age, p.CreatedOn)
 }
 
 func main() {
@@ -35,10 +27,11 @@ func main() {
 	m := PersonMapper{db}
 
 	p := &Person{
-		ID:    42,
-		Name:  "Paul Smith",
-		Email: "paulsmith@pobox.com",
-		Age:   37,
+		ID:        42,
+		Name:      "Paul Smith",
+		Email:     "paulsmith@pobox.com",
+		Age:       37,
+		CreatedOn: time.Now(),
 	}
 
 	if err := m.Insert(p); err != nil {

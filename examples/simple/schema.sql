@@ -23,7 +23,8 @@ CREATE TABLE person (
     id integer NOT NULL,
     full_name character varying,
     email character varying,
-    age integer
+    age integer,
+    created_on timestamp without time zone
 );
 
 
@@ -47,55 +48,10 @@ ALTER SEQUENCE person_id_seq OWNED BY person.id;
 
 
 --
--- Name: phone; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE phone (
-    id integer NOT NULL,
-    number character varying,
-    type integer
-);
-
-
---
--- Name: phone_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE phone_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: phone_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE phone_id_seq OWNED BY phone.id;
-
-
---
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY person ALTER COLUMN id SET DEFAULT nextval('person_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY phone ALTER COLUMN id SET DEFAULT nextval('phone_id_seq'::regclass);
-
-
---
--- Name: person_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY person
-    ADD CONSTRAINT person_pkey PRIMARY KEY (id);
 
 
 --

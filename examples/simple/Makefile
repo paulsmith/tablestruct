@@ -1,12 +1,15 @@
-OBJECT_FILES = person_mapper.go phone_mapper.go scanner.go
+OBJECT_FILES = person_mapper.go scanner.go
 
 all: $(OBJECT_FILES) simple
 
 $(OBJECT_FILES): simple.ts.json
 	tablestruct $< ./
 
-simple: $(OBJECT_FILES)
+simple: $(OBJECT_FILES) simple.go
 	go build
+
+schema.sql:
+	pg_dump -x -O -t person -s > $@
 
 .PHONY: clean
 clean:

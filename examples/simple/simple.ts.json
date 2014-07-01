@@ -14,19 +14,10 @@
             "field": "Age",
             "column": "age",
             "type": "int"
-        }]
-    },
-    {
-        "struct": "Phone",
-        "table": "phone",
-        "columns": [{
-            "field": "Number",
-            "column": "number",
-            "type": "varchar"
         }, {
-            "field": "Type",
-            "column": "type",
-            "type": "int"
+            "field": "CreatedOn",
+            "column": "created_on",
+            "type": "timestamp"
         }]
     }
 ]
