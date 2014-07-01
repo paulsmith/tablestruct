@@ -36,6 +36,7 @@ func (i importSpec) String() string {
 	return fmt.Sprintf("%s \"%s\"", i.name, i.path)
 }
 
+// Imports generates list of import specs required by generated code.
 func (t TableMap) Imports() []importSpec {
 	return []importSpec{
 		{"database/sql", ""},
@@ -43,6 +44,7 @@ func (t TableMap) Imports() []importSpec {
 	}
 }
 
+// ColumnList produces SQL for the column expressions in a SELECT statement.
 func (t TableMap) ColumnList() string {
 	cols := []string{t.PKCol()}
 	for _, col := range t.Columns {
@@ -51,6 +53,8 @@ func (t TableMap) ColumnList() string {
 	return strings.Join(cols, ", ")
 }
 
+// UpdateList produces SQL for the column-placeholder pairs in a UPDATE
+// statement.
 func (t TableMap) UpdateList() string {
 	cols := []string{}
 	for i, col := range t.Columns {
@@ -59,6 +63,8 @@ func (t TableMap) UpdateList() string {
 	return strings.Join(cols, ", ")
 }
 
+// InsertList produces SQL for the placeholders in the value expression portion
+// of an INSERT statement.
 func (t TableMap) InsertList() string {
 	cols := []string{"$1"}
 	for i := range t.Columns {
@@ -67,10 +73,12 @@ func (t TableMap) InsertList() string {
 	return strings.Join(cols, ", ")
 }
 
+// PKCol returns the name of the primary key column.
 func (t TableMap) PKCol() string {
 	return "id"
 }
 
+// Fields returns the list of field names of the Go struct being mapped.
 func (t TableMap) Fields() []string {
 	f := []string{"ID"}
 	for i := range t.Columns {
@@ -85,8 +93,10 @@ type ColumnMap struct {
 	Field  string `json:"field"`
 	Column string `json:"column"`
 	Type   string `json:"type"`
+	Null   bool   `json:"null"`
 }
 
+// Code generates Go code that maps database tables to structs.
 type Code struct {
 	buf  *bytes.Buffer
 	tmpl *template.Template
@@ -97,6 +107,7 @@ func (c Code) write(format string, param ...interface{}) {
 	c.buf.WriteString(fmt.Sprintf(format, param...))
 }
 
+// Gen generates Go code for a set of table mappings and output them to files.
 func (c Code) Gen(mapper Map, pkg string) {
 	for i, tableMap := range mapper {
 		log.Printf("%d: generating %s", i, tableMap.Struct)
