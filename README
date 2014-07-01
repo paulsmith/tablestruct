@@ -11,11 +11,6 @@ created by inspecting an existing database or set of tables.
 Generated Go code should not be checked in to version control. The generation
 step should be included as part of a build process.
 
-Developing
-----------
-
-* Install github.com/jteeuwen/go-bindata
-
 Roadmap
 -------
 

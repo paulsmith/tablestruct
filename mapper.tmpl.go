@@ -1,3 +1,6 @@
+package main
+
+var mapperTemplate = `
 // generated mechanically by tablestruct, do not edit!!
 package {{.Package}}
 
@@ -66,3 +69,4 @@ func ({{.VarName}} {{.MapperType}}) FindWhere(where string) ([]*{{.StructType}},
     }
     return objs, nil
 }
+`

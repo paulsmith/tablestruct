@@ -184,14 +184,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	tmpl, err := Asset("templates/tablestruct.go.tmpl")
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	code := Code{
 		buf:  bytes.NewBuffer(nil),
-		tmpl: template.Must(template.New("tablestruct").Parse(string(tmpl))),
+		tmpl: template.Must(template.New("tablestruct").Parse(mapperTemplate)),
 		dest: flag.Arg(1),
 	}
 	code.Gen(mapper, "main")

@@ -1,9 +1,6 @@
 all: install
 
-bindata.go: templates/tablestruct.go.tmpl
-	go-bindata $(dir $<)
-
-install: bindata.go
+install:
 	go install
 
 .PHONY: examples
