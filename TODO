@@ -21,3 +21,4 @@
 * Hooks for adding custom code
 * Factory to get a mapper for a struct
 * Support transactions
+* Other dialects (MySQL, SQLite)
