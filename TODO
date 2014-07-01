@@ -6,5 +6,4 @@
 * Handle nullability
 * Prepare all SQL statements
 * Figure out solution for FindWhere that's SQL-injection-safe
-* gofmt generated code
 * Specify output filenames
