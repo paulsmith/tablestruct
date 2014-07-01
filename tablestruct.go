@@ -165,23 +165,33 @@ func usage() {
 
 func main() {
 	flag.Usage = usage
+
 	flag.Parse()
+
 	if flag.NArg() < 1 {
 		flag.Usage()
 		os.Exit(1)
 	}
+
 	f, err := os.Open(flag.Arg(0))
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f.Close()
+
 	var mapper Map
 	if err := json.NewDecoder(f).Decode(&mapper); err != nil {
 		log.Fatal(err)
 	}
+
+	tmpl, err := Asset("templates/tablestruct.go.tmpl")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	code := Code{
 		buf:  bytes.NewBuffer(nil),
-		tmpl: template.Must(template.ParseFiles("tablestruct.go.tmpl")),
+		tmpl: template.Must(template.New("tablestruct").Parse(string(tmpl))),
 		dest: flag.Arg(1),
 	}
 	code.Gen(mapper, "main")
