@@ -1,0 +1,20 @@
+tablestruct
+===========
+
+Maps Go structs to database tables, struct fields to columns.
+
+Uses code generation.
+
+Maintain a metadata file that contains the mappings. This file can be initially
+created by inspecting an existing database or set of tables.
+
+Generated Go code should not be checked in to version control. The generation
+step should be included as part of a build process.
+
+Roadmap
+-------
+
+* 0.1: Initial release - basic mapping functionality.
+* 0.2: Introspect db to autogenerate initial mapping metadata file.
+* 0.3: Generate structs from metadata.
+* 0.4: Generate db schema from metadata.
