@@ -9,6 +9,12 @@ import (
     {{end}}
 )
 
+type Scanner interface {
+    Scan(...interface{}) error
+}
+
+{{range .TableMaps}}
+
 type {{.MapperType}} struct {
     {{range .MapperFields}}{{.}}
     {{end}}
@@ -69,4 +75,6 @@ func ({{.VarName}} {{.MapperType}}) FindWhere(where string) ([]*{{.StructType}},
     }
     return objs, nil
 }
+
+{{end}}
 `

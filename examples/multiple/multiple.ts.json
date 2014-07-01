@@ -1,0 +1,36 @@
+[
+    {
+        "struct": "Person",
+        "table": "person",
+        "columns": [{
+            "field": "Name",
+            "column": "full_name",
+            "type": "varchar"
+        }, {
+            "field": "Email",
+            "column": "email",
+            "type": "varchar"
+        }, {
+            "field": "Age",
+            "column": "age",
+            "type": "int"
+        }, {
+            "field": "CreatedOn",
+            "column": "created_on",
+            "type": "timestamp"
+        }]
+    },
+    {
+        "struct": "Phone",
+        "table": "phone",
+        "columns": [{
+            "field": "Number",
+            "column": "number",
+            "type": "varchar"
+        }, {
+            "field": "Type",
+            "column": "type",
+            "type": "int"
+        }]
+    }
+]
