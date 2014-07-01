@@ -20,6 +20,33 @@ type {{.MapperType}} struct {
     {{end}}
 }
 
+func New{{.MapperType}} (db *sql.DB) *{{.MapperType}} {
+    m := &{{.MapperType}}{
+        db: db,
+        sql: make(map[string]string),
+        stmt: make(map[string]*sql.Stmt),
+    }
+    m.prepareStatements()
+    return m
+}
+
+func ({{.VarName}} {{.MapperType}}) prepareStatements() {
+    var rawSql = map[string]string{
+        "Find": "SELECT {{.ColumnList}} FROM {{.Table}} WHERE {{.PKCol}} = $1",
+        "Update": "UPDATE {{.Table}} SET {{.UpdateList}} WHERE {{.PKCol}} = $1",
+        "Insert": "INSERT INTO {{.Table}} VALUES ({{.InsertList}})",
+        "Delete": "DELETE FROM {{.Table}} WHERE {{.PKCol}} = $1",
+    }
+    for k, v := range rawSql {
+        stmt, err := {{.VarName}}.db.Prepare(v)
+        if err != nil {
+            log.Fatalf("preparing %s SQL: %v", k, err)
+        }
+        {{.VarName}}.stmt[k] = stmt
+        {{.VarName}}.sql[k] = v
+    }
+}
+
 func ({{.VarName}} {{.MapperType}}) loadObj(scanner Scanner) (obj *{{.StructType}}, err error) {
     obj = new({{.StructType}})
     dest := []interface{}{
@@ -31,28 +58,25 @@ func ({{.VarName}} {{.MapperType}}) loadObj(scanner Scanner) (obj *{{.StructType
 }
 
 func ({{.VarName}} {{.MapperType}}) Find(key int64) (*{{.StructType}}, error) {
-    sql := "SELECT {{.ColumnList}} FROM {{.Table}} WHERE {{.PKCol}} = $1"
-    row := {{.VarName}}.db.QueryRow(sql, key)
+    row := {{.VarName}}.stmt["Find"].QueryRow(key)
     return {{.VarName}}.loadObj(row)
 }
 
 func ({{.VarName}} {{.MapperType}}) Update(obj *{{.StructType}}) error {
-    sql := "UPDATE {{.Table}} SET {{.UpdateList}} WHERE {{.PKCol}} = $1"
     args := []interface{}{
         {{range .Fields}}obj.{{.}},
         {{end}}
     }
-    _, err := {{.VarName}}.db.Exec(sql, args...)
+    _, err := {{.VarName}}.stmt["Update"].Exec(args...)
     return err
 }
 
 func ({{.VarName}} {{.MapperType}}) Insert(obj *{{.StructType}}) error {
-    sql := "INSERT INTO {{.Table}} VALUES ({{.InsertList}})"
     args := []interface{}{
         {{range .Fields}}obj.{{.}},
         {{end}}
     }
-    _, err := {{.VarName}}.db.Exec(sql, args...)
+    _, err := {{.VarName}}.stmt["Insert"].Exec(args...)
     return err
 }
 
@@ -77,8 +101,7 @@ func ({{.VarName}} {{.MapperType}}) FindWhere(where string) ([]*{{.StructType}},
 }
 
 func ({{.VarName}} {{.MapperType}}) Delete(obj *{{.StructType}}) error {
-    sql := "DELETE FROM {{.Table}} WHERE {{.PKCol}} = $1"
-    _, err := {{.VarName}}.db.Exec(sql, obj.{{.PKField}})
+    _, err := {{.VarName}}.stmt["Delete"].Exec(obj.{{.PKField}})
     return err
 }
 

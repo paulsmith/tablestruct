@@ -3,10 +3,7 @@
 * Handle aggregates (don't?)
 * Handle LIMIT and OFFSET
 * Handle ORDER BY
-* Handle nullability
-* Prepare all SQL statements
 * Figure out solution for FindWhere that's SQL-injection-safe
-* Specify output filenames
 * insert multiple
 * update multiple
 * exists

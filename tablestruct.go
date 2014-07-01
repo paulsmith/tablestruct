@@ -21,6 +21,7 @@ type Map []TableMap
 func (m Map) Imports() []importSpec {
 	return []importSpec{
 		{"database/sql", ""},
+		{"log", ""},
 		{"github.com/lib/pq", "_"},
 	}
 }
@@ -167,7 +168,12 @@ func (c Code) Gen(mapper Map, pkg string, filename string) {
 }
 
 func (c Code) genMapper(mapper TableMap) tableMapTmpl {
-	mapperFields := []string{"db *sql.DB"}
+	// TODO(paulsmith): move this.
+	mapperFields := []string{
+		"db *sql.DB",
+		"sql map[string]string",
+		"stmt map[string]*sql.Stmt",
+	}
 	return tableMapTmpl{
 		mapper.Struct + "Mapper",
 		mapperFields,

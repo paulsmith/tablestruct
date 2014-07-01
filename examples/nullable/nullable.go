@@ -23,7 +23,7 @@ func (g Guestbook) String() string {
 func main() {
 	db, _ := sql.Open("postgres", "sslmode=disable")
 
-	m := GuestbookMapper{db}
+	m := NewGuestbookMapper(db)
 
 	for _, gb := range []*Guestbook{
 		{42, "Paul Smith", sql.NullString{"Nice place!", true}, time.Now()},

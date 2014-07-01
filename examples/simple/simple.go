@@ -24,7 +24,7 @@ func (p Person) String() string {
 func main() {
 	db, _ := sql.Open("postgres", "sslmode=disable")
 
-	m := PersonMapper{db}
+	m := NewPersonMapper(db)
 
 	p := &Person{
 		ID:        42,

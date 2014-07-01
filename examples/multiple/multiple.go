@@ -42,8 +42,8 @@ func (p Phone) String() string {
 
 func main() {
 	db, _ := sql.Open("postgres", "sslmode=disable")
-	personMap := PersonMapper{db}
-	phoneMap := PhoneMapper{db}
+	personMap := NewPersonMapper(db)
+	phoneMap := NewPhoneMapper(db)
 	if err := personMap.Insert(&Person{42, "Paul Smith", "paulsmith@pobox.com", 37, time.Now()}); err != nil {
 		log.Fatal(err)
 	}
