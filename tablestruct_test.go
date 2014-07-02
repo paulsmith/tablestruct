@@ -92,7 +92,7 @@ import (
 )
 
 type T struct {
-    ID    int
+    ID    int64
     Value int
 }
 
@@ -141,7 +141,7 @@ import (
 )
 
 type ZIPCode struct {
-    ID    int
+    ID    int64
     Z5    string
 }
 
@@ -354,6 +354,57 @@ func main() {
 	Expected: "delta: 3\n",
 }
 
+var deleteTest = CodeGenTest{
+	CreateTableSQL: get.CreateTableSQL,
+	CleanupSQL:     get.CleanupSQL,
+	TableSetupSQL:  `INSERT INTO t VALUES (1, 42)`,
+	Metadata:       get.Metadata,
+	DriverCode: `
+package main
+
+import (
+    "database/sql"
+    "fmt"
+    "log"
+
+    _ "github.com/lib/pq"
+)
+
+type T struct {
+    ID      int64
+    Value   int
+}
+
+func main() {
+    db, err := sql.Open("postgres", "")
+    if err != nil {
+        log.Fatal(err)
+    }
+    m := NewTMapper(db)
+    var before, after, exists int
+    if err := db.QueryRow("SELECT COUNT(*) FROM t").Scan(&before); err != nil {
+        log.Fatal(err)
+    }
+    t, err := m.Get(1)
+    if err != nil {
+        log.Fatal(err)
+    }
+    if err := m.Delete(t); err != nil {
+        log.Fatal(err)
+    }
+    if err := db.QueryRow("SELECT COUNT(*) FROM t").Scan(&after); err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("delta: %d\n", before-after)
+    if err := db.QueryRow("SELECT COUNT(*) FROM t WHERE id = 1").Scan(&exists); err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("exists: %d\n", exists)
+}
+`,
+	Expected: "delta: 1\nexists: 0\n",
+}
+
 type CodeGenTest struct {
 	CreateTableSQL string
 	TableSetupSQL  string
@@ -440,6 +491,7 @@ func TestCodeGen(t *testing.T) {
 		"Insert":     insert,
 		"Update":     update,
 		"InsertMany": insertMany,
+		"Delete":     deleteTest,
 	}
 	for name, test := range tests {
 		t.Log(name)
