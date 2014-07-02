@@ -19,3 +19,5 @@
 * Library-ify
 * Helpers for when you just want to write SQL
 * Rename VarName -> Var or something shorter in template
+* Clean up examples
+* Write up getting started
