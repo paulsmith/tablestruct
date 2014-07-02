@@ -1,10 +1,8 @@
-* Handle primary keys (auto ID? (int64))
 * Include SQL functions or other expressions in output rows
 * Handle aggregates (don't?)
 * Handle LIMIT and OFFSET
 * Handle ORDER BY
 * Figure out solution for FindWhere that's SQL-injection-safe
-* insert multiple
 * update multiple
 * exists
 * count
@@ -12,7 +10,6 @@
 * find by field
 * find one by field
 * save (insert/update)
-* insert returning ID
 * override naming
 * Hooks for adding custom code
 * Factory to get a mapper for a struct
