@@ -11,5 +11,8 @@ before_script:
 before_install:
     - psql --version
 
+install:
+    - go get github.com/lib/pq
+
 script:
     env PGUSER=postgres go test -v
