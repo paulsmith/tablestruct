@@ -6,10 +6,14 @@ install:
 check:
 	go test -v
 
-.PHONY: examples
-examples:
-	$(MAKE) -C examples/simple
+EXAMPLES = \
+	examples/simple \
+	examples/nullable \
+	examples/multiple \
+	examples/insertmany
 
-.PHONY: clean
-clean:
-	rm -f bindata.go
+examples: $(EXAMPLES)
+
+.PHONY: examples $(EXAMPLES)
+$(EXAMPLES):
+	$(MAKE) -C $@
