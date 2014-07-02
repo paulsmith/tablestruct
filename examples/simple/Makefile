@@ -3,7 +3,7 @@ OBJECT_FILES = mapper.go
 all: $(OBJECT_FILES) simple
 
 $(OBJECT_FILES): simple.ts.json
-	tablestruct $< ./
+	tablestruct < $< > $@
 
 simple: $(OBJECT_FILES) simple.go
 	go build

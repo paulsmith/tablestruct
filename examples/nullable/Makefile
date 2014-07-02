@@ -3,7 +3,7 @@ OBJECT_FILES = mapper.go
 all: $(OBJECT_FILES) nullable
 
 $(OBJECT_FILES): nullable.ts.json
-	tablestruct $< ./
+	tablestruct < $< > $@
 
 nullable: $(OBJECT_FILES) nullable.go
 	go build

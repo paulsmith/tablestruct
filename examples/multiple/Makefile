@@ -3,7 +3,7 @@ OBJECT_FILES = mapper.go
 all: $(OBJECT_FILES) multiple
 
 $(OBJECT_FILES): multiple.ts.json
-	tablestruct $< ./
+	tablestruct < $< > $@
 
 multiple: $(OBJECT_FILES) multiple.go
 	go build

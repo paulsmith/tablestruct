@@ -8,6 +8,7 @@ import (
 	"go/format"
 	"go/parser"
 	"go/token"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -17,8 +18,17 @@ import (
 // Map describes a mapping between database tables and Go structs.
 type Map []TableMap
 
+// NewMap constructs a new mapping object.
+func NewMap(in io.Reader) (*Map, error) {
+	var mapper Map
+	if err := json.NewDecoder(os.Stdin).Decode(&mapper); err != nil {
+		return nil, err
+	}
+	return &mapper, nil
+}
+
 // Imports generates list of import specs required by generated code.
-func (m Map) Imports() []importSpec {
+func (m *Map) Imports() []importSpec {
 	return []importSpec{
 		{"database/sql", ""},
 		{"log", ""},
@@ -132,10 +142,17 @@ type ColumnMap struct {
 type Code struct {
 	buf  *bytes.Buffer
 	tmpl *template.Template
-	dest string
 }
 
-func (c Code) write(format string, param ...interface{}) {
+// NewCode creates a new code generator.
+func NewCode() *Code {
+	return &Code{
+		buf:  bytes.NewBuffer(nil),
+		tmpl: template.Must(template.New("tablestruct").Parse(mapperTemplate)),
+	}
+}
+
+func (c *Code) write(format string, param ...interface{}) {
 	c.buf.WriteString(fmt.Sprintf(format, param...))
 }
 
@@ -155,8 +172,8 @@ type tableMapTmpl struct {
 	InsertList   string
 }
 
-// Gen generates Go code for a set of table mappings and output them to files.
-func (c Code) Gen(mapper Map, pkg string, filename string) {
+// Gen generates Go code for a set of table mappings.
+func (c *Code) Gen(mapper *Map, pkg string, out io.Writer) {
 	data := struct {
 		Package   string
 		Imports   []importSpec
@@ -166,7 +183,7 @@ func (c Code) Gen(mapper Map, pkg string, filename string) {
 		Imports: mapper.Imports(),
 	}
 
-	for i, tableMap := range mapper {
+	for i, tableMap := range *mapper {
 		log.Printf("%d: generating map %s -> %s", i, tableMap.Table, tableMap.Struct)
 		data.TableMaps = append(data.TableMaps, c.genMapper(tableMap))
 	}
@@ -175,26 +192,19 @@ func (c Code) Gen(mapper Map, pkg string, filename string) {
 		log.Fatal(err)
 	}
 
-	path := c.dest + "/" + filename
-	f, err := os.Create(path)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-
 	// gofmt
 	fset := token.NewFileSet()
 	ast, err := parser.ParseFile(fset, "", c.buf.Bytes(), parser.ParseComments)
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = format.Node(f, fset, ast)
+	err = format.Node(out, fset, ast)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (c Code) genMapper(mapper TableMap) tableMapTmpl {
+func (c *Code) genMapper(mapper TableMap) tableMapTmpl {
 	// TODO(paulsmith): move this.
 	mapperFields := []string{
 		"db *sql.DB",
@@ -218,40 +228,18 @@ func (c Code) genMapper(mapper TableMap) tableMapTmpl {
 	}
 }
 
-func usage() {
-	fmt.Fprintf(os.Stderr, "Usage: %s <metadata_file> <output_dir>\n", os.Args[0])
-}
-
 func main() {
 	var (
-		pkg      = flag.String("pkg", "main", "package of generated code")
-		filename = flag.String("filename", "mapper.go", "name of generated mapper file")
+		pkg = flag.String("pkg", "main", "package of generated code")
 	)
-
-	flag.Usage = usage
 
 	flag.Parse()
 
-	if flag.NArg() < 1 {
-		flag.Usage()
-		os.Exit(1)
-	}
-
-	f, err := os.Open(flag.Arg(0))
+	mapper, err := NewMap(os.Stdin)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer f.Close()
 
-	var mapper Map
-	if err := json.NewDecoder(f).Decode(&mapper); err != nil {
-		log.Fatal(err)
-	}
-
-	code := Code{
-		buf:  bytes.NewBuffer(nil),
-		tmpl: template.Must(template.New("tablestruct").Parse(mapperTemplate)),
-		dest: flag.Arg(1),
-	}
-	code.Gen(mapper, *pkg, *filename)
+	code := NewCode()
+	code.Gen(mapper, *pkg, os.Stdout)
 }
