@@ -32,7 +32,7 @@ func New{{.MapperType}} (db *sql.DB) *{{.MapperType}} {
 
 func ({{.VarName}} {{.MapperType}}) prepareStatements() {
     var rawSql = map[string]string{
-        "Find": "SELECT {{.ColumnList}} FROM {{.Table}} WHERE {{.PKCol}} = $1",
+        "Get": "SELECT {{.ColumnList}} FROM {{.Table}} WHERE {{.PKCol}} = $1",
         "Update": "UPDATE {{.Table}} SET {{.UpdateList}} WHERE {{.PKCol}} = $1",
         "Insert": "INSERT INTO {{.Table}} VALUES ({{.Mapper.InsertList}}) RETURNING {{.PKCol}}",
         "Delete": "DELETE FROM {{.Table}} WHERE {{.PKCol}} = $1",
@@ -58,8 +58,8 @@ func ({{.VarName}} {{.MapperType}}) loadObj(scanner Scanner) (obj *{{.StructType
     return
 }
 
-func ({{.VarName}} {{.MapperType}}) Find(key int64) (*{{.StructType}}, error) {
-    row := {{.VarName}}.stmt["Find"].QueryRow(key)
+func ({{.VarName}} {{.MapperType}}) Get(key int64) (*{{.StructType}}, error) {
+    row := {{.VarName}}.stmt["Get"].QueryRow(key)
     return {{.VarName}}.loadObj(row)
 }
 

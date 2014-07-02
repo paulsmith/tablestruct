@@ -38,7 +38,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	p2, err := m.Find(42)
+	p2, err := m.Get(42)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,7 +51,7 @@ func main() {
 		fmt.Println(p2)
 	}
 
-	p3, err := m.Find(42)
+	p3, err := m.Get(42)
 	if err != nil {
 		log.Fatal(err)
 	}

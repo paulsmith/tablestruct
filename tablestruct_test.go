@@ -50,7 +50,7 @@ func tempDir(f Fataler) string {
 }
 
 func tempFile(dir string, f Fataler) *os.File {
-	file, err := ioutil.TempFile(dir, "tablestruct_test_Find")
+	file, err := ioutil.TempFile(dir, "tablestruct_test")
 	if err != nil {
 		f.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func tempGoFile(dir string, f Fataler) *os.File {
 	return file
 }
 
-func TestFind(t *testing.T) {
+func TestGet(t *testing.T) {
 	db := openTestDB(t)
 	defer db.Close()
 
@@ -135,7 +135,7 @@ func main() {
         log.Fatal(err)
     }
     m := NewTMapper(db)
-    t, err := m.Find(8)
+    t, err := m.Get(8)
     if err != nil {
         log.Fatal(err)
     }
