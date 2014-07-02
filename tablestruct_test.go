@@ -246,6 +246,53 @@ func main() {
 `,
 }
 
+var update = CodeGenTest{
+	CreateTableSQL: insert.CreateTableSQL,
+	CleanupSQL:     insert.CleanupSQL,
+	TableSetupSQL:  `INSERT INTO person VALUES (42, 'Paul Smith', 37)`,
+	Metadata:       insert.Metadata,
+	DriverCode: `
+package main
+
+import (
+    "database/sql"
+    "fmt"
+    "log"
+
+    _ "github.com/lib/pq"
+)
+
+type Person struct {
+    ID      int64
+    Name    string
+    Age     int
+}
+
+func main() {
+    db, err := sql.Open("postgres", "")
+    if err != nil {
+        log.Fatal(err)
+    }
+    m := NewPersonMapper(db)
+    p := Person{42, "Brian Eno", 66}
+    if err = m.Update(&p); err != nil {
+        log.Fatal(err)
+    }
+    dest := []interface{}{
+        new(int64),
+        new(string),
+        new(int),
+    }
+    err = db.QueryRow("SELECT * FROM person WHERE id = 42").Scan(dest...)
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("%d '%s' %d\n", *dest[0].(*int64), *dest[1].(*string), *dest[2].(*int))
+}
+`,
+	Expected: "42 'Brian Eno' 66\n",
+}
+
 type CodeGenTest struct {
 	CreateTableSQL string
 	TableSetupSQL  string
@@ -330,6 +377,7 @@ func TestCodeGen(t *testing.T) {
 		"Get":    get,
 		"All":    all,
 		"Insert": insert,
+		"Update": update,
 	}
 	for name, test := range tests {
 		t.Log(name)
