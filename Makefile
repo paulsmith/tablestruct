@@ -3,6 +3,9 @@ all: install
 install:
 	go install
 
+check:
+	go test -v
+
 .PHONY: examples
 examples:
 	$(MAKE) -C examples/simple
