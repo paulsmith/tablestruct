@@ -63,26 +63,11 @@ func tempGoFile(dir string, f Fataler) *os.File {
 	return file
 }
 
-func TestGet(t *testing.T) {
-	db := openTestDB(t)
-	defer db.Close()
-
-	_, err := db.Exec(`CREATE TABLE t (id int, val int)`)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		// TODO(paulsmith): create temp table doesn't work here, need to
-		// investigate more.
-		db.Exec(`DROP TABLE t`)
-	}()
-
-	_, err = db.Exec(`INSERT INTO t (SELECT generate_series(0, 10), generate_series(100, 110))`)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	var metadata = `
+var get = CodeGenTest{
+	CreateTableSQL: `CREATE TABLE t (id int, val int)`,
+	CleanupSQL:     `DROP TABLE t`,
+	TableSetupSQL:  `INSERT INTO t (SELECT generate_series(0, 10), generate_series(100, 110))`,
+	Metadata: `
 [
     {
         "struct": "T",
@@ -94,26 +79,8 @@ func TestGet(t *testing.T) {
         }]
     }
 ]
-`
-	mapper, err := NewMap(strings.NewReader(metadata))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	dir := tempDir(t)
-	genCodeFile := tempGoFile(dir, t)
-	driverCodeFile := tempGoFile(dir, t)
-
-	defer func() {
-		genCodeFile.Close()
-		driverCodeFile.Close()
-		os.RemoveAll(dir)
-	}()
-
-	code := NewCode()
-	code.Gen(mapper, "main", genCodeFile)
-
-	var driverCode = `
+`,
+	DriverCode: `
 package main
 
 import (
@@ -141,8 +108,119 @@ func main() {
     }
     fmt.Printf("%d\n", t.Value)
 }
-`
-	if _, err := driverCodeFile.WriteString(driverCode); err != nil {
+`,
+	Expected: "108\n",
+}
+
+var all = CodeGenTest{
+	CreateTableSQL: `CREATE TABLE zipcodes (id int, zipcode varchar)`,
+	CleanupSQL:     `DROP TABLE zipcodes`,
+	TableSetupSQL:  `INSERT INTO zipcodes (SELECT generate_series(0, 9), generate_series(21230, 21239)::varchar)`,
+	Metadata: `
+[
+    {
+        "struct": "ZIPCode",
+        "table": "zipcodes",
+        "columns": [{
+            "field": "Z5",
+            "column": "zipcode",
+            "type": "varchar"
+        }]
+    }
+]
+`,
+	DriverCode: `
+package main
+
+import (
+    "database/sql"
+    "fmt"
+    "log"
+
+    _ "github.com/lib/pq"
+)
+
+type ZIPCode struct {
+    ID    int
+    Z5    string
+}
+
+func main() {
+    db, err := sql.Open("postgres", "")
+    if err != nil {
+        log.Fatal(err)
+    }
+    m := NewZIPCodeMapper(db)
+    zips, err := m.All()
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("%d\n", len(zips))
+    for i := range zips {
+        fmt.Printf("%s\n", zips[i].Z5)
+    }
+}
+`,
+	Expected: `10
+21230
+21231
+21232
+21233
+21234
+21235
+21236
+21237
+21238
+21239
+`}
+
+type CodeGenTest struct {
+	CreateTableSQL string
+	TableSetupSQL  string
+	CleanupSQL     string
+	Metadata       string
+	DriverCode     string
+	Expected       string
+}
+
+func testCodeGen(t *testing.T, test CodeGenTest) {
+	db := openTestDB(t)
+	defer db.Close()
+
+	_, err := db.Exec(test.CreateTableSQL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if test.CleanupSQL != "" {
+			db.Exec(test.CleanupSQL)
+		}
+	}()
+
+	_, err = db.Exec(test.TableSetupSQL)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	mapper, err := NewMap(strings.NewReader(test.Metadata))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	dir := tempDir(t)
+	genCodeFile := tempGoFile(dir, t)
+	driverCodeFile := tempGoFile(dir, t)
+
+	defer func() {
+		genCodeFile.Close()
+		driverCodeFile.Close()
+		os.RemoveAll(dir)
+	}()
+
+	code := NewCode()
+	code.Gen(mapper, "main", genCodeFile)
+
+	if _, err := driverCodeFile.WriteString(test.DriverCode); err != nil {
 		t.Fatal(err)
 	}
 
@@ -160,14 +238,26 @@ func main() {
 	}
 
 	cmd := exec.Command("go", args...)
-	var out bytes.Buffer
-	cmd.Stdout = &out
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {
-		t.Fatal(err)
+		t.Log(stderr.String())
+		t.Fatalf("error running generated Go code: %s", err)
 	}
 
-	expected := "108\n"
-	if actual := out.String(); actual != expected {
-		t.Errorf("want %q, got %q", expected, actual)
+	if actual := stdout.String(); actual != test.Expected {
+		t.Errorf("want %q, got %q", test.Expected, actual)
+	}
+}
+
+func TestCodeGen(t *testing.T) {
+	var tests = map[string]CodeGenTest{
+		"Get": get,
+		"All": all,
+	}
+	for name, test := range tests {
+		t.Log(name)
+		testCodeGen(t, test)
 	}
 }

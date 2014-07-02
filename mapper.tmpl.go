@@ -36,6 +36,7 @@ func ({{.VarName}} {{.MapperType}}) prepareStatements() {
         "Update": "UPDATE {{.Table}} SET {{.UpdateList}} WHERE {{.PKCol}} = $1",
         "Insert": "INSERT INTO {{.Table}} VALUES ({{.Mapper.InsertList}}) RETURNING {{.PKCol}}",
         "Delete": "DELETE FROM {{.Table}} WHERE {{.PKCol}} = $1",
+        "All": "SELECT {{.ColumnList}} FROM {{.Table}}",
     }
     for k, v := range rawSql {
         stmt, err := {{.VarName}}.db.Prepare(v)
@@ -101,12 +102,7 @@ func ({{.VarName}} {{.MapperType}}) InsertMany(objs []*{{.StructType}}) error {
     return tx.Commit()
 }
 
-func ({{.VarName}} {{.MapperType}}) FindWhere(where string) ([]*{{.StructType}}, error) {
-    sql := "SELECT {{.ColumnList}} FROM {{.Table}} WHERE " + where
-    rows, err := {{.VarName}}.db.Query(sql)
-    if err != nil {
-        return nil, err
-    }
+func ({{.VarName}} {{.MapperType}}) loadManyObjs(rows *sql.Rows) ([]*{{.StructType}}, error) {
     var objs []*{{.StructType}}
     for rows.Next() {
         obj, err := {{.VarName}}.loadObj(rows)
@@ -119,6 +115,23 @@ func ({{.VarName}} {{.MapperType}}) FindWhere(where string) ([]*{{.StructType}},
         return nil, err
     }
     return objs, nil
+}
+
+func ({{.VarName}} {{.MapperType}}) FindWhere(where string) ([]*{{.StructType}}, error) {
+    sql := "SELECT {{.ColumnList}} FROM {{.Table}} WHERE " + where
+    rows, err := {{.VarName}}.db.Query(sql)
+    if err != nil {
+        return nil, err
+    }
+    return {{.VarName}}.loadManyObjs(rows)
+}
+
+func ({{.VarName}} {{.MapperType}}) All() ([]*{{.StructType}}, error) {
+    rows, err := {{.VarName}}.stmt["All"].Query()
+    if err != nil {
+        return nil, err
+    }
+    return {{.VarName}}.loadManyObjs(rows)
 }
 
 func ({{.VarName}} {{.MapperType}}) Delete(obj *{{.StructType}}) error {
