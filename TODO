@@ -4,14 +4,15 @@
 * Handle ORDER BY
 * Figure out solution for FindWhere that's SQL-injection-safe
 * update multiple
+* delete multiple
 * exists
-* count
+* count (don't?)
 * find by field
 * find one by field
 * save (insert/update)
 * override naming
 * Hooks for adding custom code
-* Factory to get a mapper for a struct
+* Factory to get a mapper for a struct (registry?)
 * Support transactions
 * Other dialects (MySQL, SQLite)
 * Un-export things
