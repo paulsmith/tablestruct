@@ -34,7 +34,7 @@ func ({{.VarName}} {{.MapperType}}) prepareStatements() {
     var rawSql = map[string]string{
         "Find": "SELECT {{.ColumnList}} FROM {{.Table}} WHERE {{.PKCol}} = $1",
         "Update": "UPDATE {{.Table}} SET {{.UpdateList}} WHERE {{.PKCol}} = $1",
-        "Insert": "INSERT INTO {{.Table}} VALUES ({{.InsertList}})",
+        "Insert": "INSERT INTO {{.Table}} VALUES ({{.Mapper.InsertList}}) RETURNING {{.PKCol}}",
         "Delete": "DELETE FROM {{.Table}} WHERE {{.PKCol}} = $1",
     }
     for k, v := range rawSql {
@@ -71,13 +71,18 @@ func ({{.VarName}} {{.MapperType}}) Update(obj *{{.StructType}}) error {
     return err
 }
 
-func ({{.VarName}} {{.MapperType}}) Insert(obj *{{.StructType}}) error {
+func ({{.VarName}} {{.MapperType}}) insert(obj *{{.StructType}}, stmt *sql.Stmt) error {
     args := []interface{}{
-        {{range .Fields}}obj.{{.}},
+        {{range .Mapper.InsertFields}}obj.{{.}},
         {{end}}
     }
-    _, err := {{.VarName}}.stmt["Insert"].Exec(args...)
+    row := stmt.QueryRow(args...)
+    err := row.Scan(&obj.{{.PKField}})
     return err
+}
+
+func ({{.VarName}} {{.MapperType}}) Insert(obj *{{.StructType}}) error {
+    return {{.VarName}}.insert(obj, {{.VarName}}.stmt["Insert"])
 }
 
 func ({{.VarName}} {{.MapperType}}) InsertMany(objs []*{{.StructType}}) error {
@@ -87,11 +92,7 @@ func ({{.VarName}} {{.MapperType}}) InsertMany(objs []*{{.StructType}}) error {
     }
     stmt := tx.Stmt({{.VarName}}.stmt["Insert"])
     for _, obj := range objs {
-        args := []interface{}{
-            {{range .Fields}}obj.{{.}},
-            {{end}}
-        }
-        _, err := stmt.Exec(args...)
+        err := {{.VarName}}.insert(obj, stmt)
         if err != nil {
             return err
         }

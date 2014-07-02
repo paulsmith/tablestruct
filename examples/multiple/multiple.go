@@ -48,10 +48,10 @@ func main() {
 		log.Fatal(err)
 	}
 	phones := []Phone{
-		{1, "800-555-1212", Work},
-		{2, "202-123-4567", Home},
-		{3, "312-987-6543", Other},
-		{4, "301-848-4848", Mobile},
+		{0, "800-555-1212", Work},
+		{0, "202-123-4567", Home},
+		{0, "312-987-6543", Other},
+		{0, "301-848-4848", Mobile},
 	}
 	for _, p := range phones {
 		if err := phoneMap.Insert(&p); err != nil {

@@ -23,6 +23,7 @@
     {
         "struct": "Phone",
         "table": "phone",
+        "auto_pk": true,
         "columns": [{
             "field": "Number",
             "column": "number",
