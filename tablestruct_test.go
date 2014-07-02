@@ -217,11 +217,18 @@ func main() {
         log.Fatal(err)
     }
     m := NewPersonMapper(db)
-    p := Person{42, "Paul Smith", 37}
-    err = m.Insert(&p)
-    if err != nil {
+    var before, after int
+    if err := db.QueryRow("SELECT COUNT(*) FROM person").Scan(&before); err != nil {
         log.Fatal(err)
     }
+    p := Person{42, "Paul Smith", 37}
+    if err = m.Insert(&p); err != nil {
+        log.Fatal(err)
+    }
+    if err := db.QueryRow("SELECT COUNT(*) FROM person").Scan(&after); err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("delta: %d\n", after-before)
     dest := []interface{}{
         new(int64),
         new(string),
@@ -234,7 +241,9 @@ func main() {
     fmt.Printf("%d '%s' %d\n", *dest[0].(*int64), *dest[1].(*string), *dest[2].(*int))
 }
 `,
-	Expected: "42 'Paul Smith' 37\n",
+	Expected: `delta: 1
+42 'Paul Smith' 37
+`,
 }
 
 type CodeGenTest struct {
