@@ -293,6 +293,67 @@ func main() {
 	Expected: "42 'Brian Eno' 66\n",
 }
 
+var insertMany = CodeGenTest{
+	CreateTableSQL: insert.CreateTableSQL,
+	CleanupSQL:     insert.CleanupSQL,
+	TableSetupSQL:  insert.TableSetupSQL,
+	Metadata:       insert.Metadata,
+	DriverCode: `
+package main
+
+import (
+    "database/sql"
+    "fmt"
+    "log"
+
+    _ "github.com/lib/pq"
+)
+
+type Person struct {
+    ID      int64
+    Name    string
+    Age     int
+}
+
+func main() {
+    db, err := sql.Open("postgres", "")
+    if err != nil {
+        log.Fatal(err)
+    }
+    m := NewPersonMapper(db)
+    var before, after int
+    if err := db.QueryRow("SELECT COUNT(*) FROM person").Scan(&before); err != nil {
+        log.Fatal(err)
+    }
+    people := []*Person{
+        {42, "Paul Smith", 37},
+        {43, "Brian Eno", 66},
+        {44, "Ada Lovelace", 27},
+    }
+    if err = m.InsertMany(people); err != nil {
+        log.Fatal(err)
+    }
+    if err := db.QueryRow("SELECT COUNT(*) FROM person").Scan(&after); err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("delta: %d\n", after-before)
+    /*
+    dest := []interface{}{
+        new(int64),
+        new(string),
+        new(int),
+    }
+    err = db.QueryRow("SELECT * FROM person WHERE id = 42").Scan(dest...)
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("%d '%s' %d\n", *dest[0].(*int64), *dest[1].(*string), *dest[2].(*int))
+    */
+}
+`,
+	Expected: "delta: 3\n",
+}
+
 type CodeGenTest struct {
 	CreateTableSQL string
 	TableSetupSQL  string
@@ -374,10 +435,11 @@ func testCodeGen(t *testing.T, test CodeGenTest) {
 
 func TestCodeGen(t *testing.T) {
 	var tests = map[string]CodeGenTest{
-		"Get":    get,
-		"All":    all,
-		"Insert": insert,
-		"Update": update,
+		"Get":        get,
+		"All":        all,
+		"Insert":     insert,
+		"Update":     update,
+		"InsertMany": insertMany,
 	}
 	for name, test := range tests {
 		t.Log(name)
