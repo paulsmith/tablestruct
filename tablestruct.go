@@ -189,6 +189,7 @@ func (c *Code) Gen(mapper *Map, pkg string, out io.Writer) {
 	}
 
 	if err := c.tmpl.Execute(c.buf, data); err != nil {
+		// TODO(paulsmith): return error
 		log.Fatal(err)
 	}
 
@@ -196,10 +197,12 @@ func (c *Code) Gen(mapper *Map, pkg string, out io.Writer) {
 	fset := token.NewFileSet()
 	ast, err := parser.ParseFile(fset, "", c.buf.Bytes(), parser.ParseComments)
 	if err != nil {
+		// TODO(paulsmith): return error
 		log.Fatal(err)
 	}
 	err = format.Node(out, fset, ast)
 	if err != nil {
+		// TODO(paulsmith): return error
 		log.Fatal(err)
 	}
 }

@@ -40,6 +40,7 @@ func ({{.VarName}} {{.MapperType}}) prepareStatements() {
     for k, v := range rawSql {
         stmt, err := {{.VarName}}.db.Prepare(v)
         if err != nil {
+            // TODO(paulsmith): return error instead.
             log.Fatalf("preparing %s SQL: %v", k, err)
         }
         {{.VarName}}.stmt[k] = stmt
