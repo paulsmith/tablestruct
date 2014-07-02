@@ -174,6 +174,69 @@ func main() {
 21239
 `}
 
+var insert = CodeGenTest{
+	CreateTableSQL: `CREATE TABLE person (id int, name varchar, age int)`,
+	CleanupSQL:     `DROP TABLE person`,
+	Metadata: `
+[
+    {
+        "struct": "Person",
+        "table": "person",
+        "columns": [{
+            "field": "Name",
+            "column": "name",
+            "type": "varchar"
+        }, {
+            "field": "Age",
+            "column": "age",
+            "type": "int"
+        }]
+    }
+]
+`,
+	DriverCode: `
+package main
+
+import (
+    "database/sql"
+    "fmt"
+    "log"
+
+    _ "github.com/lib/pq"
+)
+
+type Person struct {
+    ID      int64
+    Name    string
+    Age     int
+}
+
+func main() {
+    db, err := sql.Open("postgres", "")
+    if err != nil {
+        log.Fatal(err)
+    }
+    m := NewPersonMapper(db)
+    p := Person{42, "Paul Smith", 37}
+    err = m.Insert(&p)
+    if err != nil {
+        log.Fatal(err)
+    }
+    dest := []interface{}{
+        new(int64),
+        new(string),
+        new(int),
+    }
+    err = db.QueryRow("SELECT * FROM person WHERE id = 42").Scan(dest...)
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("%d '%s' %d\n", *dest[0].(*int64), *dest[1].(*string), *dest[2].(*int))
+}
+`,
+	Expected: "42 'Paul Smith' 37\n",
+}
+
 type CodeGenTest struct {
 	CreateTableSQL string
 	TableSetupSQL  string
@@ -197,9 +260,11 @@ func testCodeGen(t *testing.T, test CodeGenTest) {
 		}
 	}()
 
-	_, err = db.Exec(test.TableSetupSQL)
-	if err != nil {
-		t.Fatal(err)
+	if test.TableSetupSQL != "" {
+		_, err = db.Exec(test.TableSetupSQL)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	mapper, err := NewMap(strings.NewReader(test.Metadata))
@@ -253,8 +318,9 @@ func testCodeGen(t *testing.T, test CodeGenTest) {
 
 func TestCodeGen(t *testing.T) {
 	var tests = map[string]CodeGenTest{
-		"Get": get,
-		"All": all,
+		"Get":    get,
+		"All":    all,
+		"Insert": insert,
 	}
 	for name, test := range tests {
 		t.Log(name)
