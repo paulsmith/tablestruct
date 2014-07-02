@@ -5,7 +5,17 @@ tablestruct
 
 Maps Go structs to database tables, struct fields to columns.
 
-Uses code generation.
+It provides common functionality for persisting structs to and retrieving
+structs from the database, such as:
+
+* find by ID/primary key
+* insert
+* insert many (in transaction)
+* update
+* delete
+* find by WHERE clause
+
+tablestruct uses code generation.
 
 Maintain a metadata file that contains the mappings. This file can be initially
 created by inspecting an existing database or set of tables.
