@@ -405,6 +405,43 @@ func main() {
 	Expected: "delta: 1\nexists: 0\n",
 }
 
+var findWhere = CodeGenTest{
+	CreateTableSQL: get.CreateTableSQL,
+	CleanupSQL:     get.CleanupSQL,
+	TableSetupSQL:  get.TableSetupSQL,
+	Metadata:       get.Metadata,
+	DriverCode: `
+package main
+
+import (
+    "database/sql"
+    "fmt"
+    "log"
+
+    _ "github.com/lib/pq"
+)
+
+type T struct {
+    ID    int64
+    Value int
+}
+
+func main() {
+    db, err := sql.Open("postgres", "")
+    if err != nil {
+        log.Fatal(err)
+    }
+    m := NewTMapper(db)
+    res, err := m.FindWhere("val > 105")
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("%d\n", len(res))
+}
+`,
+	Expected: "5\n",
+}
+
 type CodeGenTest struct {
 	CreateTableSQL string
 	TableSetupSQL  string
@@ -492,6 +529,7 @@ func TestCodeGen(t *testing.T) {
 		"Update":     update,
 		"InsertMany": insertMany,
 		"Delete":     deleteTest,
+		"FindWhere":  findWhere,
 	}
 	for name, test := range tests {
 		t.Log(name)
