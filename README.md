@@ -8,7 +8,7 @@ Maps Go structs to database tables, struct fields to columns.
 It provides common functionality for persisting structs to and retrieving
 structs from the database, such as:
 
-* find by ID/primary key
+* get by ID/primary key
 * insert
 * insert many (in transaction)
 * update
