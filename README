@@ -1,6 +1,8 @@
 tablestruct
 ===========
 
+[![Build Status](https://travis-ci.org/paulsmith/tablestruct.svg)](https://travis-ci.org/paulsmith/tablestruct)
+
 Maps Go structs to database tables, struct fields to columns.
 
 Uses code generation.
