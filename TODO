@@ -6,7 +6,6 @@
 * update multiple
 * exists
 * count
-* find all
 * find by field
 * find one by field
 * save (insert/update)
@@ -17,3 +16,5 @@
 * Other dialects (MySQL, SQLite)
 * Un-export things
 * Library-ify
+* Helpers for when you just want to write SQL
+* Rename VarName -> Var or something shorter in template
