@@ -42,6 +42,7 @@ func ({{.VarName}} {{.MapperType}}) prepareStatements() {
         stmt, err := {{.VarName}}.db.Prepare(v)
         if err != nil {
             // TODO(paulsmith): return error instead.
+            log.Printf("SQL: %q", v)
             log.Fatalf("preparing %s SQL: %v", k, err)
         }
         {{.VarName}}.stmt[k] = stmt
@@ -137,6 +138,10 @@ func ({{.VarName}} {{.MapperType}}) All() ([]*{{.StructType}}, error) {
 func ({{.VarName}} {{.MapperType}}) Delete(obj *{{.StructType}}) error {
     _, err := {{.VarName}}.stmt["Delete"].Exec(obj.{{.PKField}})
     return err
+}
+
+func ({{.VarName}} {{.MapperType}}) Table() string {
+    return "{{.Table}}"
 }
 
 {{end}}

@@ -71,7 +71,7 @@ func (t TableMap) ColumnList() string {
 // UpdateList produces SQL for the column-placeholder pairs in a UPDATE
 // statement.
 func (t TableMap) UpdateList() string {
-	cols := []string{}
+	cols := []string{t.PKCol() + " = $1"}
 	for i, col := range t.Columns {
 		cols = append(cols, fmt.Sprintf("%s = $%d", col.Column, i+2))
 	}

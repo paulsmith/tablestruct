@@ -442,6 +442,37 @@ func main() {
 	Expected: "5\n",
 }
 
+var table = CodeGenTest{
+	CreateTableSQL: `CREATE TABLE foo (id serial)`,
+	CleanupSQL:     `DROP TABLE foo`,
+	Metadata:       `[{"struct": "Foo", "table": "foo", "columns": []}]`,
+	DriverCode: `
+package main
+
+import (
+    "database/sql"
+    "fmt"
+    "log"
+
+    _ "github.com/lib/pq"
+)
+
+type Foo struct {
+    ID int64
+}
+
+func main() {
+    db, err := sql.Open("postgres", "")
+    if err != nil {
+        log.Fatal(err)
+    }
+    m := NewFooMapper(db)
+    fmt.Printf("%s\n", m.Table())
+}
+`,
+	Expected: "foo\n",
+}
+
 type CodeGenTest struct {
 	CreateTableSQL string
 	TableSetupSQL  string
@@ -530,6 +561,7 @@ func TestCodeGen(t *testing.T) {
 		"InsertMany": insertMany,
 		"Delete":     deleteTest,
 		"FindWhere":  findWhere,
+		"Table":      table,
 	}
 	for name, test := range tests {
 		t.Log(name)
