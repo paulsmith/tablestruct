@@ -1,5 +1,14 @@
 package tablestruct
 
+var supportTemplate = `
+// generated mechanically by tablestruct, do not edit!!
+package {{.Package}}
+
+type Scanner interface {
+    Scan(...interface{}) error
+}
+`
+
 var mapperTemplate = `
 // generated mechanically by tablestruct, do not edit!!
 package {{.Package}}
@@ -8,10 +17,6 @@ import (
     {{range .Imports}}{{.}}
     {{end}}
 )
-
-type Scanner interface {
-    Scan(...interface{}) error
-}
 
 {{range .TableMaps}}
 
@@ -32,10 +37,12 @@ func New{{.MapperType}} (db *sql.DB) *{{.MapperType}} {
 
 func ({{.VarName}} {{.MapperType}}) prepareStatements() {
     var rawSql = map[string]string{
-        "Get": "SELECT {{.ColumnList}} FROM {{.Table}} WHERE {{.PKCol}} = $1",
-        "Update": "UPDATE {{.Table}} SET {{.UpdateList}} WHERE {{.PKCol}} = $1",
-        "Insert": "INSERT INTO {{.Table}} VALUES ({{.Mapper.InsertList}}) RETURNING {{.PKCol}}",
-        "Delete": "DELETE FROM {{.Table}} WHERE {{.PKCol}} = $1",
+        {{if .Mapper.PrimaryKey}}
+        "Get": "SELECT {{.ColumnList}} FROM {{.Table}} WHERE {{.Mapper.PrimaryKey.Column}} = $1",
+        "Update": "UPDATE {{.Table}} SET {{.Mapper.UpdateList}} WHERE {{.Mapper.PrimaryKey.Column}} = ${{len .Mapper.Columns | add 1}}",
+        "Insert": "INSERT INTO {{.Table}} VALUES ({{.Mapper.InsertList}}) RETURNING {{.Mapper.PrimaryKey.Column}}",
+        "Delete": "DELETE FROM {{.Table}} WHERE {{.Mapper.PrimaryKey.Column}} = $1",
+        {{end}}
         "All": "SELECT {{.ColumnList}} FROM {{.Table}}",
     }
     for k, v := range rawSql {
@@ -65,10 +72,12 @@ func ({{.VarName}} {{.MapperType}}) Get(key int64) (*{{.StructType}}, error) {
     return {{.VarName}}.loadObj(row)
 }
 
+{{if .Mapper.PrimaryKey}}
 func ({{.VarName}} {{.MapperType}}) Update(obj *{{.StructType}}) error {
     args := []interface{}{
         {{range .Fields}}obj.{{.}},
         {{end}}
+        obj.{{.Mapper.PrimaryKey.Field}},
     }
     _, err := {{.VarName}}.stmt["Update"].Exec(args...)
     return err
@@ -80,7 +89,7 @@ func ({{.VarName}} {{.MapperType}}) insert(obj *{{.StructType}}, stmt *sql.Stmt)
         {{end}}
     }
     row := stmt.QueryRow(args...)
-    err := row.Scan(&obj.{{.PKField}})
+    err := row.Scan(&obj.{{.Mapper.PrimaryKey.Field}})
     return err
 }
 
@@ -102,6 +111,7 @@ func ({{.VarName}} {{.MapperType}}) InsertMany(objs []*{{.StructType}}) error {
     }
     return tx.Commit()
 }
+{{end}}
 
 func ({{.VarName}} {{.MapperType}}) loadManyObjs(rows *sql.Rows) ([]*{{.StructType}}, error) {
     var objs []*{{.StructType}}
@@ -135,10 +145,12 @@ func ({{.VarName}} {{.MapperType}}) All() ([]*{{.StructType}}, error) {
     return {{.VarName}}.loadManyObjs(rows)
 }
 
+{{if .Mapper.PrimaryKey}}
 func ({{.VarName}} {{.MapperType}}) Delete(obj *{{.StructType}}) error {
-    _, err := {{.VarName}}.stmt["Delete"].Exec(obj.{{.PKField}})
+    _, err := {{.VarName}}.stmt["Delete"].Exec(obj.{{.Mapper.PrimaryKey.Field}})
     return err
 }
+{{end}}
 
 func ({{.VarName}} {{.MapperType}}) Table() string {
     return "{{.Table}}"

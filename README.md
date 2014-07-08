@@ -27,7 +27,8 @@ Roadmap
 -------
 
 * 0.1: Initial release - basic mapping functionality.
-* 0.2: Introspect db to autogenerate initial mapping metadata file.
-* 0.3: Generate structs from metadata.
-* 0.4: Generate db schema from metadata.
-* 0.5: Joins.
+* 0.2: Generate mapping metadata from existing structs.
+* 0.3: Inspect db to generate initial mapping metadata file.
+* 0.4: Generate structs from metadata.
+* 0.5: Generate db schema from metadata.
+* 0.6: Joins.

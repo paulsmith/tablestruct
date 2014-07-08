@@ -30,7 +30,7 @@ func (i importSpec) String() string {
 
 // ColumnList produces SQL for the column expressions in a SELECT statement.
 func (t TableMap) ColumnList() string {
-	cols := []string{t.PKCol()}
+	var cols []string
 	for _, col := range t.Columns {
 		cols = append(cols, col.Column)
 	}
@@ -40,9 +40,9 @@ func (t TableMap) ColumnList() string {
 // UpdateList produces SQL for the column-placeholder pairs in a UPDATE
 // statement.
 func (t TableMap) UpdateList() string {
-	cols := []string{t.PKCol() + " = $1"}
+	var cols []string
 	for i, col := range t.Columns {
-		cols = append(cols, fmt.Sprintf("%s = $%d", col.Column, i+2))
+		cols = append(cols, fmt.Sprintf("%s = $%d", col.Column, i+1))
 	}
 	return strings.Join(cols, ", ")
 }
@@ -54,14 +54,14 @@ func (t TableMap) InsertList() string {
 		vals   []string
 		offset = 1
 	)
-	if t.AutoPK {
-		vals = []string{"default"}
-	} else {
-		vals = []string{"$1"}
-		offset = 2
-	}
+	offset = 0
 	for i := range t.Columns {
-		vals = append(vals, fmt.Sprintf("$%d", i+offset))
+		if t.AutoPK && t.Columns[i].PrimaryKey {
+			vals = append(vals, "default")
+			continue
+		}
+		offset++
+		vals = append(vals, fmt.Sprintf("$%d", offset))
 	}
 	return strings.Join(vals, ", ")
 }
@@ -70,30 +70,37 @@ func (t TableMap) InsertList() string {
 // insert statement.
 func (t TableMap) InsertFields() []string {
 	var fields []string
-	if !t.AutoPK {
-		fields = []string{"ID"}
-	}
 	for i := range t.Columns {
+		if t.AutoPK && t.Columns[i].PrimaryKey {
+			continue
+		}
 		fields = append(fields, t.Columns[i].Field)
 	}
 	return fields
 }
 
-// PKCol returns the name of the primary key column.
-func (t TableMap) PKCol() string {
-	return "id"
-}
-
-// PKField returns the name of the primary key struct field.
-func (t TableMap) PKField() string {
-	return "ID"
-}
-
 // Fields returns the list of field names of the Go struct being mapped.
 func (t TableMap) Fields() []string {
-	f := []string{t.PKField()}
+	var f []string
 	for i := range t.Columns {
 		f = append(f, t.Columns[i].Field)
 	}
 	return f
+}
+
+// PrimaryKey returns the column mapping for the primary key field/column.
+func (t TableMap) PrimaryKey() *ColumnMap {
+	for i := range t.Columns {
+		if t.Columns[i].PrimaryKey {
+			return &t.Columns[i]
+		}
+	}
+	return nil
+}
+
+// StructToTable converts a Go struct name to a database table name. It is
+// mainly CamelCase -> snake_case, with some special cases, and is overridable.
+func StructToTable(strct string) string {
+	// TODO(paulsmith): implement what the doc comment actually says.
+	return strings.ToLower(strct)
 }

@@ -73,6 +73,11 @@ var get = CodeGenTest{
         "struct": "T",
         "table": "t",
         "columns": [{
+            "field": "ID",
+            "column": "id",
+            "type": "int",
+            "pk": true
+        }, {
             "field": "Value",
             "column": "val",
             "type": "int"
@@ -122,6 +127,10 @@ var all = CodeGenTest{
         "struct": "ZIPCode",
         "table": "zipcodes",
         "columns": [{
+            "field": "ID",
+            "column": "id",
+            "pk": true
+        }, {
             "field": "Z5",
             "column": "zipcode",
             "type": "varchar"
@@ -183,6 +192,10 @@ var insert = CodeGenTest{
         "struct": "Person",
         "table": "person",
         "columns": [{
+            "field": "ID",
+            "column": "id",
+            "pk": true
+        }, {
             "field": "Name",
             "column": "name",
             "type": "varchar"
@@ -445,7 +458,7 @@ func main() {
 var table = CodeGenTest{
 	CreateTableSQL: `CREATE TABLE foo (id serial)`,
 	CleanupSQL:     `DROP TABLE foo`,
-	Metadata:       `[{"struct": "Foo", "table": "foo", "columns": []}]`,
+	Metadata:       `[{"struct": "Foo", "table": "foo", "columns": [{"field": "ID", "column": "id", "pk": true}]}]`,
 	DriverCode: `
 package main
 
@@ -511,10 +524,12 @@ func testCodeGen(t *testing.T, test CodeGenTest) {
 	dir := tempDir(t)
 	genCodeFile := tempGoFile(dir, t)
 	driverCodeFile := tempGoFile(dir, t)
+	supportFile := tempGoFile(dir, t)
 
 	defer func() {
 		genCodeFile.Close()
 		driverCodeFile.Close()
+		supportFile.Close()
 		os.RemoveAll(dir)
 	}()
 
@@ -525,8 +540,11 @@ func testCodeGen(t *testing.T, test CodeGenTest) {
 		t.Fatal(err)
 	}
 
+	GenSupport(supportFile, "main")
+
 	genCodeFile.Sync()
 	driverCodeFile.Sync()
+	supportFile.Sync()
 
 	goFiles, err := filepath.Glob(filepath.Join(dir, "*.go"))
 	if err != nil {

@@ -16,8 +16,14 @@
 * Support transactions
 * Other dialects (MySQL, SQLite)
 * Un-export things
-* Library-ify
 * Helpers for when you just want to write SQL
 * Rename VarName -> Var or something shorter in template
 * Clean up examples
 * Write up getting started
+* Async APIs
+* Low-level Query API
+* Factor out "type"writers
+* Move table name to mapper struct
+* Embed *sql.DB in mapper structs
+* Exclude methods (ones you don't need like Delete(), etc.)
+* Move pk bool from column to table

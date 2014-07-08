@@ -20,9 +20,10 @@ type Code struct {
 
 // NewCode creates a new code generator.
 func NewCode() *Code {
+	funcMap := template.FuncMap{"add": func(a, b int) int { return a + b }}
 	return &Code{
 		buf:  bytes.NewBuffer(nil),
-		tmpl: template.Must(template.New("tablestruct").Parse(mapperTemplate)),
+		tmpl: template.Must(template.New("tablestruct").Funcs(funcMap).Parse(mapperTemplate)),
 	}
 }
 
@@ -38,8 +39,6 @@ type tableMapTmpl struct {
 	StructType   string
 	ColumnList   string
 	Table        string
-	PKCol        string
-	PKField      string
 	Fields       []string
 	UpdateList   string
 	UpdateCount  int
@@ -96,8 +95,6 @@ func (c *Code) genMapper(mapper TableMap) tableMapTmpl {
 		mapper.Struct,
 		mapper.ColumnList(),
 		mapper.Table,
-		mapper.PKCol(),
-		mapper.PKField(),
 		mapper.Fields(),
 		mapper.UpdateList(),
 		len(mapper.Columns) + 1,
