@@ -1,16 +1,14 @@
-package main
+package tablestruct
 
 import (
 	"bytes"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"go/format"
 	"go/parser"
 	"go/token"
 	"io"
 	"log"
-	"os"
 	"strings"
 	"text/template"
 )
@@ -229,20 +227,4 @@ func (c *Code) genMapper(mapper TableMap) tableMapTmpl {
 		len(mapper.Columns) + 1,
 		mapper.InsertList(),
 	}
-}
-
-func main() {
-	var (
-		pkg = flag.String("pkg", "main", "package of generated code")
-	)
-
-	flag.Parse()
-
-	mapper, err := NewMap(os.Stdin)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	code := NewCode()
-	code.Gen(mapper, *pkg, os.Stdout)
 }

@@ -1,7 +1,7 @@
 all: install
 
 install:
-	go install
+	go install ./...
 
 check:
 	go test -v

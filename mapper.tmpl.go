@@ -1,4 +1,4 @@
-package main
+package tablestruct
 
 var mapperTemplate = `
 // generated mechanically by tablestruct, do not edit!!
