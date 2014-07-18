@@ -22,6 +22,5 @@ func (m *Map) Imports() []importSpec {
 	return []importSpec{
 		{"database/sql", ""},
 		{"log", ""},
-		{"github.com/lib/pq", "_"},
 	}
 }
