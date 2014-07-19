@@ -29,6 +29,15 @@ Tentative roadmap
 tablestruct documentation
 =========================
 
+Installation
+------------
+
+Requires Go 1.2.
+
+```bash
+go get github.com/paulsmith/tablestruct/cmd/tablestruct
+```
+
 Quickstart
 ----------
 
