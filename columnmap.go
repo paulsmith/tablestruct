@@ -1,6 +1,10 @@
 package tablestruct
 
-import "strings"
+import (
+	"strings"
+
+	"bitbucket.org/pkg/inflect"
+)
 
 // ColumnMap describes a mapping between a Go struct field and a database
 // column.
@@ -16,6 +20,8 @@ type ColumnMap struct {
 // name. It is mainly CamelCase -> snake_case, with some special cases, and is
 // overridable.
 func FieldToColumn(field string) string {
-	// TODO(paulsmith): implement what the doc comment actually says.
-	return strings.ToLower(field)
+	if len(field) < 4 {
+		return strings.ToLower(field)
+	}
+	return inflect.Underscore(field)
 }

@@ -15,7 +15,7 @@ import (
 
 func usage() {
 	fmt.Fprintf(os.Stderr, "usage: %s [-package=<package>] gen\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "   or: %s [-package=<package>] [-table=<table>] [-pk=<field>] struct <structname>\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "   or: %s [-package=<package>] [-table=<table>] [-pk=<field>] metadata <structname>\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "   or: %s [-package=<package>] support\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "option defaults:\n")
 	flag.PrintDefaults()
@@ -141,7 +141,7 @@ func main() {
 
 	cmds := commands{
 		{"gen", func() { gen(*pkg) }},
-		{"struct", func() {
+		{"metadata", func() {
 			if flag.Arg(1) == "" {
 				fmt.Fprintf(os.Stderr, "must supply name of struct type\n")
 				flag.Usage()

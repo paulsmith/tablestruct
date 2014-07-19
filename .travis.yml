@@ -13,6 +13,7 @@ before_install:
 
 install:
     - go get github.com/lib/pq
+    - go get bitbucket.org/pkg/inflect
 
 script:
     env PGUSER=postgres go test -v

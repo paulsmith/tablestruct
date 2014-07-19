@@ -3,6 +3,8 @@ package tablestruct
 import (
 	"fmt"
 	"strings"
+
+	"bitbucket.org/pkg/inflect"
 )
 
 // TableMap describes a mapping between a Go struct and database table.
@@ -101,6 +103,8 @@ func (t TableMap) PrimaryKey() *ColumnMap {
 // StructToTable converts a Go struct name to a database table name. It is
 // mainly CamelCase -> snake_case, with some special cases, and is overridable.
 func StructToTable(strct string) string {
-	// TODO(paulsmith): implement what the doc comment actually says.
-	return strings.ToLower(strct)
+	if len(strct) < 4 {
+		return strings.ToLower(strct)
+	}
+	return inflect.Underscore(strct)
 }
