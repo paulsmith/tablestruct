@@ -375,7 +375,7 @@ STRUCT_person=Person
 struct_files := event.go person.go
 mapper_files := $(patsubst %.go,%_mapper.go,$(struct_files))
 
-all: $(mapper_files)
+all: $(mapper_files) mapper_support.go
 
 %_mapper.go: %.go
     tablestruct -package=$(PACKAGE) metadata $(STRUCT_$(basename $<)) < $< | \
@@ -389,9 +389,10 @@ mapper_support.go:
 Then run `make`:
 
 ```bash
-$ make
-tablestruct -package=main metadata Event < event.go | \
-	tablestruct -package=main gen > event_mapper.go
-tablestruct -package=main metadata Person < person.go | \
-	tablestruct -package=main gen > person_mapper.go
+$ make PACKAGE=mypkg
+tablestruct -package=mypkg metadata Event < event.go | \
+	tablestruct -package=mypkg gen > event_mapper.go
+tablestruct -package=mypkg metadata Person < person.go | \
+	tablestruct -package=mypkg gen > person_mapper.go
+tablestruct -package=mypkg support > mapper_support.go
 ```
