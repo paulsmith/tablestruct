@@ -75,6 +75,13 @@ tablestruct is meant to ease the workaday usage and maintenance of structs that
 map to tables. It is a goal to have a simple implementation, the intermediate
 steps of which are easily inspectable.
 
+### Ambition
+
+tablestruct has low ambition. It does not intend to do that much, for example,
+it will never be a complete "ORM", nor will it ever replace writing SQL
+inside Go code. It merely wants to be useful for a set of common, low-level data
+persistence operations.
+
 Theory of operation
 -------------------
 
@@ -313,4 +320,68 @@ func main() {
 Tips & tricks
 -------------
 
-Makefiles ...
+### Make
+
+The best way to use tablestruct is via `make(1)` and `Makefiles`.
+
+Set up a rule where the target is the generated mapper file and the prerequisite
+is the Go source file containing the struct type:
+
+```make
+PACKAGE=main
+
+event_mapper: event.go
+    tablestruct -package=$(PACKAGE) metadata Event < $< | \
+    tablestruct -package=$(PACKAGE) gen > $@
+```
+
+You'll need the mapper support file, so good to add that:
+
+```make
+.PHONY: mapper_support.go
+mapper_support.go:
+    tablestruct -package=$(PACKAGE) support > $@
+```
+
+If you have multiple struct files, it is better to use `make`'s pattern rules.
+The only trick is to match the struct type name to the Go file it's in.
+
+```make
+STRUCT_event=Event
+STRUCT_person=Person
+
+%_mapper.go: %.go
+    tablestruct -package=$(PACKAGE) metadata $(STRUCT_$(basename $<)) < $< | \
+    tablestruct -package=$(PACKAGE) gen > $@
+```
+
+Then gather up all the mapper files as a separate target:
+
+```make
+struct_files := event.go person.go
+mapper_files := $(patsubst %.go,%_mapper.go,$(struct_files))
+
+all: $(mapper_files)
+```
+
+The final `Makefile` looks something like:
+
+```make
+PACKAGE=main
+
+STRUCT_event=Event
+STRUCT_person=Person
+
+struct_files := event.go person.go
+mapper_files := $(patsubst %.go,%_mapper.go,$(struct_files))
+
+all: $(mapper_files)
+
+%_mapper.go: %.go
+    tablestruct -package=$(PACKAGE) metadata $(STRUCT_$(basename $<)) < $< | \
+    tablestruct -package=$(PACKAGE) gen > $@
+
+.PHONY: mapper_support.go
+mapper_support.go:
+    tablestruct -package=$(PACKAGE) support > $@
+```

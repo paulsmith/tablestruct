@@ -34,3 +34,4 @@
 * [ ] Remove importing lib/pq from codegen
 * [ ] Clean up genMapper
 * [ ] Move "Mapper" prefix to Code field and let main driver set it
+* [ ] Remove concrete *sql.DB in favor of interfaces, to support eg., sqlx
