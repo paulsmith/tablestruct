@@ -78,7 +78,7 @@ steps of which are easily inspectable.
 ### Ambition
 
 tablestruct has low ambition. It does not intend to do that much, for example,
-it will never be a complete "ORM", nor will it ever replace writing SQL
+it will never be a complete ORM, nor will it ever replace writing SQL
 inside Go code. It merely wants to be useful for a set of common, low-level data
 persistence operations.
 
@@ -287,7 +287,7 @@ func main() {
 
     event.Resolved = true
     event.Description = sql.NullString{String: "investigated and resolved", Valid: true}
-    mapper.Update(e1)
+    mapper.Update(event)
 
     fmt.Println(event.ID)
     // Output: 1
