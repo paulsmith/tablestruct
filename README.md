@@ -343,8 +343,8 @@ mapper_support.go:
     tablestruct -package=$(PACKAGE) support > $@
 ```
 
-If you have multiple struct files, it is better to use `make`'s pattern rules.
-The only trick is to match the struct type name to the Go file it's in.
+If you have multiple struct files, it is better to make use of `make`'s pattern
+rules. The only trick is to match the struct type name to the Go file it's in.
 
 ```make
 STRUCT_event=Event
@@ -384,4 +384,14 @@ all: $(mapper_files)
 .PHONY: mapper_support.go
 mapper_support.go:
     tablestruct -package=$(PACKAGE) support > $@
+```
+
+Then run `make`:
+
+```bash
+$ make
+tablestruct -package=main metadata Event < event.go | \
+	tablestruct -package=main gen > event_mapper.go
+tablestruct -package=main metadata Person < person.go | \
+	tablestruct -package=main gen > person_mapper.go
 ```
