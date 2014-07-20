@@ -277,18 +277,19 @@ func main() {
 
     mapper := mypkg.NewEventMapper(db)
 
-    e1 := &mypkg.Event{
+    event := &mypkg.Event{
         Title: "my severe event",
         UnixTimestamp: time.Now().Unix(),
         Severity: 1.0,
     }
 
-    mapper.Insert(e1)
+    mapper.Insert(event)
 
-    e1.Resolved = true
+    event.Resolved = true
+    event.Description = sql.NullString{String: "investigated and resolved", Valid: true}
     mapper.Update(e1)
 
-    fmt.Println(e1.ID)
+    fmt.Println(event.ID)
     // Output: 1
 
     events := []*mypkg.Event{
