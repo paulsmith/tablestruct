@@ -17,10 +17,11 @@ structs from the database, including but not limited to:
 
 tablestruct uses code generation to produce mappers.
 
+Current release: **0.1.0** (July 19, 2014)
+
 Tentative roadmap
 -----------------
 
-* 0.1: Initial release - basic mapping functionality.
 * 0.2: Inspect db to generate initial mapping metadata file.
 * 0.3: Generate structs from metadata.
 * 0.4: Generate db schema from metadata.
