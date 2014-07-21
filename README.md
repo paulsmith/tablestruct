@@ -1,7 +1,7 @@
 tablestruct
 ===========
 
-[![Build Status](https://travis-ci.org/paulsmith/tablestruct.svg)](https://travis-ci.org/paulsmith/tablestruct)
+[![Build Status](https://drone.io/github.com/paulsmith/tablestruct/status.png)](https://drone.io/github.com/paulsmith/tablestruct/latest)
 
 `tablestruct` maps Go structs to database tables, and struct fields to columns.
 
