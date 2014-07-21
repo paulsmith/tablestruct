@@ -97,7 +97,7 @@ they handle the mapping between structs and tables, and fields and columns, in
 SQL for operations like inserts and updates, and in Go code for initializing new
 structs from query result sets. The mappers are generated as separate files
 of Go code that reside in the same package as the rest of your code. You can
-be override this behavior to target any package.
+override this behavior to target any package.
 
 The way to use tablestruct during the normal course of development is to create
 your main structs and your database tables, run tablestruct as a command to
