@@ -3,9 +3,11 @@ tablestruct
 
 [![Build Status](https://travis-ci.org/paulsmith/tablestruct.svg)](https://travis-ci.org/paulsmith/tablestruct)
 
-Maps Go structs to database tables, struct fields to columns.
+`tablestruct` maps Go structs to database tables, and struct fields to columns.
 
-It provides common functionality for persisting structs to and retrieving
+It is a lightweight alternative to ORMs. It preserves type-safety and eschews reflection. 
+
+It provides common operations for persisting structs to and retrieving
 structs from the database, including but not limited to:
 
 * get by ID/primary key
@@ -14,8 +16,6 @@ structs from the database, including but not limited to:
 * update
 * delete
 * find by WHERE clause
-
-tablestruct uses code generation to produce mappers.
 
 Current release: **0.1.0** (July 19, 2014)
 
