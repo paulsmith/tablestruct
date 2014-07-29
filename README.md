@@ -3,6 +3,24 @@ tablestruct
 
 [![Build Status](https://drone.io/github.com/paulsmith/tablestruct/status.png)](https://drone.io/github.com/paulsmith/tablestruct/latest)
 
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+
+- [tablestruct](#user-content-tablestruct)
+	- [Introduction](#user-content-introduction)
+	- [Tentative roadmap](#user-content-tentative-roadmap)
+- [tablestruct documentation](#user-content-tablestruct-documentation)
+	- [Installation](#user-content-installation)
+	- [Quickstart](#user-content-quickstart)
+	- [Motivation](#user-content-motivation)
+		- [Ambition](#user-content-ambition)
+	- [Theory of operation](#user-content-theory-of-operation)
+	- [Current limitations](#user-content-current-limitations)
+	- [Mapping metadata](#user-content-mapping-metadata)
+	- [Mapper API](#user-content-mapper-api)
+	- [Example](#user-content-example)
+	- [Tips & tricks](#user-content-tips--tricks)
+		- [Make](#user-content-make)
+
 Introduction
 ------------
 
