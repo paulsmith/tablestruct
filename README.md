@@ -3,6 +3,9 @@ tablestruct
 
 [![Build Status](https://drone.io/github.com/paulsmith/tablestruct/status.png)](https://drone.io/github.com/paulsmith/tablestruct/latest)
 
+Introduction
+------------
+
 `tablestruct` maps Go structs to database tables, and struct fields to columns.
 
 It is a lightweight alternative to ORMs. It preserves type-safety and eschews reflection. 
